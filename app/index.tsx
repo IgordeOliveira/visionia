@@ -8,11 +8,14 @@ import {LinearGradient} from "expo-linear-gradient";
 import {BlurView} from "expo-blur";
 import {Colors} from "@/constants/Colors";
 import {Image} from 'expo-image';
+import {useKeepAwake} from "expo-keep-awake";
 
 export default function Index() {
+    useKeepAwake();
     const [processing, setProcessing] = useState<boolean>(false);
     const [init, setInit] = useState<boolean>(false);
     const [permission, requestPermission] = useCameraPermissions();
+    const [isCameraReady, setIsCameraReady] = useState(false);
     const cameraRef = useRef<CameraView>(null);
     const initRef = useRef(init); // Cria uma ref para armazenar o valor atual de init
 
@@ -20,16 +23,16 @@ export default function Index() {
 
 
     useEffect(() => {
-        console.log(init)
+        console.log({init: init, isCameraReady: isCameraReady})
         initRef.current = init; // Atualiza a ref sempre que init muda
-        if (init) {
+        if (init && isCameraReady) {
             takeAndSpeak()
         } else {
             console.log('cancelando request')
             controller.abort()
         }
 
-    }, [init]);
+    }, [init, isCameraReady]);
 
     if (!permission) {
         // Camera permissions are still loading.
@@ -44,7 +47,7 @@ export default function Index() {
                 colors={[Colors.argentinian_blue.DEFAULT, Colors.argentinian_blue["800"]]}
                 style={styles.background}
             >
-                <View style={[styles.container]}>
+                <View style={[styles.container, {alignItems: 'center'}]}>
                     <Image
                         style={styles.image}
                         source={require("../assets/images/logoname.png")}
@@ -117,7 +120,7 @@ export default function Index() {
     //Camera view
     return (
         <View style={styles.container}>
-            <CameraView style={styles.camera} animateShutter={false} ref={cameraRef}>
+            <CameraView style={styles.camera} animateShutter={false} ref={cameraRef} onCameraReady={() => setIsCameraReady(true)}>
                 <View style={styles.overlayTop}>
                     <Image
                         style={styles.image}

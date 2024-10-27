@@ -9,11 +9,13 @@ import {BlurView} from "expo-blur";
 import {Colors} from "@/constants/Colors";
 import {Image} from 'expo-image';
 import {useKeepAwake} from "expo-keep-awake";
+import {MaterialIcons} from "@expo/vector-icons";
 
 export default function Index() {
     useKeepAwake();
     const [processing, setProcessing] = useState<boolean>(false);
     const [init, setInit] = useState<boolean>(false);
+    const [enableTorch, setEnableTorch] = useState<boolean>(false);
     const [permission, requestPermission] = useCameraPermissions();
     const [isCameraReady, setIsCameraReady] = useState(false);
     const cameraRef = useRef<CameraView>(null);
@@ -117,10 +119,13 @@ export default function Index() {
 
     const btnBgColor = init ? 'red' : 'green';
 
+    function toggleFlash() {
+        setEnableTorch(current => (!current));
+    }
     //Camera view
     return (
         <View style={styles.container}>
-            <CameraView style={styles.camera} animateShutter={false} ref={cameraRef} onCameraReady={() => setIsCameraReady(true)}>
+            <CameraView style={styles.camera} animateShutter={false} ref={cameraRef} enableTorch={enableTorch} onCameraReady={() => setIsCameraReady(true)}>
                 <View style={styles.overlayTop}>
                     <Image
                         style={styles.image}
@@ -130,13 +135,27 @@ export default function Index() {
                     />
                 </View>
                 <BlurView intensity={100} style={styles.overlayBottom}>
-                    <Pressable style={[styles.button, {backgroundColor: btnBgColor}]} onPress={() => setInit(!init)}>
-                        <Text style={styles.text}>{init ? "Parar" : "Iniciar"}</Text>
-                    </Pressable>
-                    {processing && <View style={{flexDirection: 'row', gap: 8}}>
-                        <Text style={[styles.text, {color: Colors.cobalt_blue.DEFAULT}]}>Processando</Text>
-                        <ActivityIndicator color={Colors.cobalt_blue.DEFAULT}/>
-                    </View>}
+                    <View style={{
+                        flexDirection: 'row',
+                    }}>
+                        <View style={styles.box} />
+                        <View style={styles.box}>
+                            <Pressable style={[styles.button, {backgroundColor: btnBgColor}]} onPress={() => setInit(!init)}>
+                                <Text style={styles.text}>{init ? "Parar" : "Iniciar"}</Text>
+                            </Pressable>
+                            {processing && <View style={{flexDirection: 'row', gap: 8}}>
+                                <Text style={[styles.text, {color: Colors.cobalt_blue.DEFAULT}]}>Processando</Text>
+                                <ActivityIndicator color={Colors.cobalt_blue.DEFAULT}/>
+                            </View>}
+                        </View>
+                        <View style={styles.box}>
+                            <Pressable
+                                style={styles.buttonRounded}
+                                onPress={toggleFlash}>
+                                <MaterialIcons name={enableTorch ? 'flashlight-off' : 'flashlight-on' } size={24} color="black" />
+                            </Pressable>
+                        </View>
+                    </View>
                 </BlurView>
 
             </CameraView>
@@ -145,6 +164,12 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+    box: {
+        flex: 1, // Each box takes up equal space
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 8
+    },
     image: {
         flex: 1,
         width: '45%'
@@ -169,13 +194,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 10,
-        paddingHorizontal: 26,
+        paddingHorizontal: 28,
         borderRadius: 4,
         elevation: 1,
         backgroundColor: 'green',
     },
+    buttonRounded: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 8,
+        borderRadius: 100,
+        elevation: 1,
+        backgroundColor: 'white'
+    },
     text: {
-        fontFamily: 'SpaceMono',
+        fontFamily: 'Roboto',
         fontSize: 16,
         color: 'white',
     },

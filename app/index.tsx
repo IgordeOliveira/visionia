@@ -1,6 +1,6 @@
 import {CameraView, CameraType, useCameraPermissions} from 'expo-camera';
 import {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, Button, Pressable, StyleSheet, Text, View} from 'react-native';
+import {ActivityIndicator, Button, Pressable, StyleSheet, Text, ToastAndroid, View} from 'react-native';
 import axios from "axios";
 import * as Speech from 'expo-speech';
 import {HelloWave} from "@/components/HelloWave";
@@ -96,6 +96,8 @@ export default function Index() {
 
         }).catch(function (error) {
             console.log(error);
+            ToastAndroid.show('Erro ao conectar na API!', ToastAndroid.SHORT);
+            setInit(false)
         }).finally(() => {
             setProcessing(false);
         })
@@ -113,7 +115,7 @@ export default function Index() {
 
     async function takePhoto() {
         console.log('take photo');
-        const image = await cameraRef.current?.takePictureAsync({base64: true, quality: 0.5});
+        const image = await cameraRef.current?.takePictureAsync({base64: true, quality: 0.5, shutterSound: false});
         return image?.base64
     }
 

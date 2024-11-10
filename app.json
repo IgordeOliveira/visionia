@@ -13,11 +13,12 @@
       "backgroundColor": "#e2f1fb"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.igoroliveira.visionia"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/iconBgWhite.png",
         "backgroundColor": "#e2f1fb"
       },
       "permissions": [
